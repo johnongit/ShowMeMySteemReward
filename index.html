@@ -1,52 +1,51 @@
 <html>
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
 </head>
 
 <body>
-<br>
-<br>
-<div class="ui two column centered grid">
-  <div class="column">
-<h3 class="ui header">Type your reward in Steem Dollar (as displayed on Steemit and Busy)</h3>
-<div class="ui input" >
-  <input placeholder="Type your reward..." type="text" id="reward">
-</div>
+
+	<div class="ui two column centered grid">
+		<div class="column">
+			<p>
+			<h3 class="ui header">Type your reward in Steem Dollar (as displayed on Steemit and Busy)</h3>
+			<div class="ui input" >
+				<input placeholder="Type your reward..." type="text" id="reward">
+			</div>
+			</p>
 
 
-
-<div class="ui divider"></div>
-<h3 class="ui header">50/50 reward</h3>
-<p>
-<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
-</p>
-<p>
-<span><b>Steem dollars real value</b> : </span><span class="sbd_part">0</span> <span>US Dollar(s)</span>
-</p>
-<ul><b>(Reward In Steem Dollar / 2) x Steem Dollar Price</b> :
-<span>(<span class="total-100">0</span>/2)*<span class="sbd_price">0</span> = <span class="sbd_part">0</span></ul>
-<p>
-<span><b>Steem Power real value</b> : </span><span class="dollar_part">0</span> <span>US Dollar(s)</span>
-</p>
-<ul><b>Reward In Steem Dollar / 2</b> :
-<span><span class="total-100">0</span>/2 = <span class="dollar_part">0</span></ul>
-<p>
-<span><b>Total </b>: </span><span class="total-50-50">0</span> <span>US Dollar(s)</span>
-<ul><b>(Reward In Steem Dollar / 2) x Steem Dollar Price + (Reward In Steem)/2</b> : 
-<span>(<span class="total-100">0</span>/2)*<span class="sbd_price">0</span> + <span class="dollar_part">0</span> = <span class="total-50-50">0</span></ul>
-</p>
-<div class="ui divider"></div>
-<h3 class="ui header">100% Steem Power</h3>
-
-<span><b>Total </b>:</span> <span class="total-100">0</span> <span>US Dollar(s)</span>
+			<div class="ui divider"></div>
+			<h3 class="ui header">50/50 reward</h3>
+			<p>
+			<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
+			</p>
+			<p>
+			<span><b>Steem dollars real value</b> : </span><span class="sbd_part">0</span> <span>US Dollar(s)</span>
+			</p>
+			<ul><b>(Reward In Steem Dollar / 2) x Steem Dollar Price</b> :
+			<span>(<span class="total-100">0</span>/2)*<span class="sbd_price">0</span> = <span class="sbd_part">0</span></ul>
+			<p>
+			<span><b>Steem Power real value</b> : </span><span class="dollar_part">0</span> <span>US Dollar(s)</span>
+			</p>
+			<ul><b>Reward In Steem Dollar / 2</b> :
+			<span><span class="total-100">0</span>/2 = <span class="dollar_part">0</span></ul>
+			<p>
+			<span><b>Total </b>: </span><span class="total-50-50">0</span> <span>US Dollar(s)</span>
+			<ul><b>Settem Dollars Real Value + Steem Power Real Value</b> : 
+			<span class="sbd_part">0</span> + <span class="dollar_part">0</span></ul>
+			</p>
+			<div class="ui divider"></div>
+			<h3 class="ui header">100% Steem Power</h3>
+			<span><b>Total </b>:</span> <span class="total-100">0</span> <span>US Dollar(s)</span>
 
 
-</div>
+		</div>
 
 
-</div>
+	</div>
 
 
 
@@ -57,7 +56,6 @@ sessionStorage.setItem("sbd_price",data[0].price_usd);
    
 });
 sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
-
 $(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
 $("#reward").on("keyup", function() {
 sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
