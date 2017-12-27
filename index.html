@@ -59,7 +59,7 @@
 
 
 <script>
-$(document).ready(function() {
+$(document).load(function() {
 $.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 sessionStorage.setItem("sbd_price",data[0].price_usd);
    
