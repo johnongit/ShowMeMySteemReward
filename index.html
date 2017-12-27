@@ -59,22 +59,24 @@
 
 
 <script>
+
+
 $(document).ready(function() {
-$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
-sessionStorage.setItem("sbd_price",data[0].price_usd);
-   
+	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
+		sessionStorage.setItem("sbd_price",data[0].price_usd);
+		console.log("SBD price loaded");
+		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
+		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
+	});
 });
-sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
-$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
-$("#reward").on("keyup", function() {
-	sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
-	dollar_part = (Number.parseFloat(this.value)/2);
-	$(".sbd_part").html(Number(sbd_part).toFixed(2));
-	$(".dollar_part").html(Number(dollar_part).toFixed(2));
-	$(".total-50-50").html(Number(dollar_part + sbd_part).toFixed(2));
-	$(".total-100").html(Number(this.value).toFixed(2));
-});
-});
+	$("#reward").on("keyup", function() {
+		sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
+		dollar_part = (Number.parseFloat(this.value)/2);
+		$(".sbd_part").html(Number(sbd_part).toFixed(2));
+		$(".dollar_part").html(Number(dollar_part).toFixed(2));
+		$(".total-50-50").html(Number(dollar_part + sbd_part).toFixed(2));
+		$(".total-100").html(Number(this.value).toFixed(2));
+	});
     </script>
 </body>
 
