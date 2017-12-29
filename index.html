@@ -8,49 +8,56 @@
 
 <body>
 
-	<div class="ui two column centered grid">
-		<div class="column">
-			<p>
-			<h3 class="ui header">Type your reward in Steem Dollar (as displayed on Steemit and Busy)</h3>
+<br>
+<br>
+
+<div class="ui grid">
+	<div class="row">
+		<div class="five wide column"></div>
+		<div class="two wide column">
+			<div style="font-size: large"><b>Steem : </b><div style="font-size: small">(Price : <span class="steem_price"></span> USD)</div></div>
 			<div class="ui input" >
-				<input placeholder="Type your reward..." type="text" id="reward">
+				<input placeholder="Steem" type="text" id="steem">
 			</div>
-			</p>
-
-
-			<div class="ui divider"></div>
-			<h3 class="ui header">50/50 reward</h3>
-			<p>
-			<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
-			</p>
-			<p>
-			<span><b>Steem dollars real value</b> : </span><span class="sbd_part">0</span> <span>US Dollar(s)</span>
-			</p>
-			<ul><b>(Reward In Steem Dollar / 2) x Steem Dollar Price</b> :
-			<span>(<span class="total-100">0</span>/2)*<span class="sbd_price">0</span> = <span class="sbd_part">0</span></ul>
-			<p>
-			<span><b>Steem Power real value</b> : </span><span class="dollar_part">0</span> <span>US Dollar(s)</span>
-			</p>
-			<ul><b>Reward In Steem Dollar / 2</b> :
-			<span><span class="total-100">0</span>/2 = <span class="dollar_part">0</span></ul>
-			<p>
-			<span><b>Total </b>: </span><span class="total-50-50">0</span> <span>US Dollar(s)</span>
-			<ul><b>Settem Dollars Real Value + Steem Power Real Value</b> : 
-			<span class="sbd_part">0</span> + <span class="dollar_part">0</span></ul>
-			</p>
-			<div class="ui divider"></div>
-			<h3 class="ui header">100% Steem Power</h3>
-			<span><b>Total </b>:</span> <span class="total-100">0</span> <span>US Dollar(s)</span>
-<br><br><br><br>
-<div class="ui floating message">
-  <p>If you appreciate my work as a Steem witness, you can support me by voting for me (<a href="https://v2.steemconnect.com/sign/account-witness-vote?witness=evildido&approve=1">approve me</a>).
-</p>
+		</div>
+		<div class="two wide column" align="center"></div>
+		<div class="two wide column">
+			<h3>Euro</h3> 
+			<div class="ui input" >
+				<input placeholder="Eur" type="text" id="euro">
+			</div>
+		</div>
+		<div class="five wide column"></div>
+	</div>
+	<div class="row">
+		<div class="five wide column"></div>
+		<div class="two wide column">
+			<div style="font-size: large"><b>Steem Dollar</b><div style="font-size: small">(Price : <span class="sbd_price"></span> USD)</div></div>
+			<div class="ui input" >
+				<input placeholder="Steem Dollar" type="text" id="sbd">
+			</div>
+		</div>
+		<div class="two wide column" align="center"></div>
+		<div class="two wide column">
+		</div>
+		<div class="five wide column"></div>
+	</div>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+	<div class="row">
+	<div class="five wide column"></div>
+		<div class="six wide column">
+			<div class="ui floating message">
+        			<p>If you appreciate my work as a Steem witness, you can support me by voting for me (<a href="https://v2.steemconnect.com/sign/account-witness-vote?witness=evildido&approve=1">approve me</a>).</p>
+			</div>
+		</div>
+  	</div>
+	<div class="five wide column"></div>
 </div>
 
-		</div>
+	
 
 
-	</div>
+
 
 
 
@@ -59,24 +66,80 @@
 
 
 <script>
-
-
 $(document).ready(function() {
+	$.get('https://api.coinmarketcap.com/v1/ticker/steem/', function(data) {
+		sessionStorage.setItem("steem_price",data[0].price_usd);
+		$(".steem_price").html(Number(sessionStorage.getItem("steem_price")).toFixed(2));
+	})  
+  	.fail(function() {
+		alert( "CoinMarketCap not reachable : cannot get Steem price" );
+	});
 	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
-		console.log("SBD price loaded");
-		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
-		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
+		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2));
+	})  
+  	.fail(function() {
+		alert( "CoinMarketCap not reachable : cannot get Steem price" );
 	});
+	$.get('https://api.fixer.io/latest?base=usd', function(data) {
+		sessionStorage.setItem("USD_price",data.rates['EUR']);
+	})
+	  .fail(function() {
+		alert( "Fixo.io not reachable : cannot get Steem price" );
+	});
+	
+setInterval(function(){
+	$.get('https://api.coinmarketcap.com/v1/ticker/steem/', function(data) {
+		sessionStorage.setItem("steem_price",data[0].price_usd);
+	})  
+  	.fail(function() {
+		alert( "CoinMarketCap not reachable : cannot get Steem price" );
+	});
+	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
+		sessionStorage.setItem("sbd_price",data[0].price_usd);
+	})  
+  	.fail(function() {
+		alert( "CoinMarketCap not reachable : cannot get Steem price" );
+	});
+	$.get('https://api.fixer.io/latest?base=usd', function(data) {
+		sessionStorage.setItem("USD_price",data.rates['EUR']);
+	})
+	  .fail(function() {
+		alert( "Fixo.io not reachable : cannot get Steem price" );
+	});
+	$(".steem_price").html(Number(sessionStorage.getItem("steem_price")).toFixed(2));
+	$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2));
+	console.log("Steem Price : " + Number(sessionStorage.getItem("steem_price")).toFixed(2));
+	console.log("SBD Price : " + Number(sessionStorage.getItem("sbd_price")).toFixed(2));
+}, 60000);
 });
-	$("#reward").on("keyup", function() {
-		sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
-		dollar_part = (Number.parseFloat(this.value)/2);
-		$(".sbd_part").html(Number(sbd_part).toFixed(2));
-		$(".dollar_part").html(Number(dollar_part).toFixed(2));
-		$(".total-50-50").html(Number(dollar_part + sbd_part).toFixed(2));
-		$(".total-100").html(Number(this.value).toFixed(2));
-	});
+
+
+
+$("#steem").on("keyup", function() {
+	var steem_price_eur = sessionStorage.getItem("steem_price") * sessionStorage.getItem("USD_price")
+	$("#euro").val(Number(this.value * steem_price_eur).toFixed(2));
+	
+	var sbd_price_eur = sessionStorage.getItem("sbd_price") * sessionStorage.getItem("USD_price")
+	var sbd = this.value * steem_price_eur / sbd_price_eur
+	$("#sbd").val(Number(sbd).toFixed(2));
+});
+$("#sbd").on("keyup", function() {
+	var sbd_price_eur = sessionStorage.getItem("sbd_price") * sessionStorage.getItem("USD_price")
+	$("#euro").val(Number(this.value * sbd_price_eur).toFixed(2));
+	
+	var steem_price_eur = sessionStorage.getItem("steem_price") * sessionStorage.getItem("USD_price")
+	var steem = this.value * sbd_price_eur / steem_price_eur
+	$("#steem").val(Number(steem).toFixed(2));
+});
+$("#euro").on("keyup", function() {
+	var steem_price_eur = sessionStorage.getItem("steem_price") * sessionStorage.getItem("USD_price")
+	$("#steem").val(Number(this.value / steem_price_eur).toFixed(2));
+	var sbd_price_eur = sessionStorage.getItem("sbd_price") * sessionStorage.getItem("USD_price")
+	$("#sbd").val(Number(this.value / sbd_price_eur).toFixed(2));
+});
+
+
     </script>
 </body>
 
