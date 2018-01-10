@@ -8,13 +8,25 @@
 </head>
 
 <body>
-
+	<span data-toggle="modal"></span>
+	
+	<div class="ui modal" id="modaldiv">
+		<i class="close icon"></i>
+		<div class="header">
+    	<span class="modal-title"><span>
+  		</div>
+     	<div class="content">
+       		<p class="modal-details"></p>
+  		</div>
+	</div>
+	
+	
 	<div class="ui two column  centered grid">
 		<div class="column">
 			<p>
 			<h3 class="ui header">Type your reward in Steem Dollar (as displayed on Steemit and Busy)</h3>
 			<div class="ui input" >
-				<input placeholder="Type your reward..." type="text" id="reward">
+				<input placeholder="Type your reward..." type="text" id="reward" value=0>
 			</div>
 			
 			</p>
@@ -37,25 +49,25 @@
 			<tbody>
 				<tr>
 				<td>USD Value</td>
-				<td style="text-align: center" class="sbd_part">0</td>
-				<td style="text-align: center" class="dollar_part">0</td>
-				<td style="text-align:center" class="total-100">0</td>
+				<td style="text-align: center"><span class="sbd_part">0</span><i class="help circle icon sbd_part_info"></i></td>
+				<td style="text-align: center"><span class="dollar_part">0</span><i class="help circle icon dollar_part_info"></i></td>
+				<td style="text-align:center"><span class="total-100">0</span></td>
 				</tr>
 				<tr>
 				<td >Total USD</td>
-				<td colspan="2" style="text-align: center"  class="total-50-50">0</td>
-				<td style="text-align:center" class="total-100">0</td>
+				<td colspan="2" style="text-align: center"><span class="total-50-50">0</span><i class="help circle icon total-50-50_info"></i></td>
+				<td style="text-align:center"><span class="total-100">0</span><i class="help circle icon total-100_info"></i></td>
                 </tr>
 				<tr>
 				<td>STEEM Value</td>
-				<td style="text-align: center" class="sbd_reinvested">0</td>
-				<td style="text-align: center" class="steem">0</td>
-				<td style="text-align:center" class="total-100-insteem">0</td>
+				<td style="text-align: center"><span class="sbd_reinvested">0</span><i class="help circle icon sbd_reinvested_info"></i></td>
+				<td style="text-align: center" class="steem"><span class="steem">0</span><i class="help circle icon steem_info"></i></td>
+				<td style="text-align:center"><span class="total-100-insteem">0</span></td>
 				</tr>
 				<tr>
 				<td>Total STEEM POWER</td>
-				<td colspan="2" style="text-align:center" class="total-50-50-insteem">0</td>
-				<td style="text-align:center" class="total-100-insteem">0</td>
+				<td colspan="2" style="text-align:center" class="total-50-50-insteem"><span class="total-50-50-insteem">0</span><i class="help circle icon total-50-50-insteem_info"></i></td>
+				<td style="text-align:center" class="total-100-insteem"><span class="total-100-insteem">0</span><i class="help circle icon total-100-insteem_info"></i></td>
                 </tr>
 			</tbody>
 			</table>
@@ -67,10 +79,10 @@
 			<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
 			</p>
 			<p>
-			<span><b>STEEM Price (internal market) : </b></span><span class="Steem_internalmarket_price">0</span> <span>STEEM</span>
+			<span><b>SBD/STEEM Price (internal market) : </b></span><span class="sbdsteem_market_price">0</span> <span>STEEM</span>
 			</p>
 			<p>
-			<span><b>STEEM Price (media price) : </b></span><span class="steem_price">0</span> <span>STEEM</span>
+			<span><b>SBD/STEEM Price (media price) : </b></span><span class="steem_price">0</span> <span>STEEM</span>
 			</p>
 			<br/>
 			<p>
@@ -117,13 +129,12 @@ $(document).ready(function() {
 	steem.api.setOptions({ url: 'https://api.steemit.com' });
 	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
-		console.log("SBD price loaded");
 		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
 		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
 	});
 	steem.api.getOrderBook(1, function(err, result) {
-		sessionStorage.setItem("Steem_internalmarket_price",Number(result.asks[0].real_price).toFixed(2));
-		$(".Steem_internalmarket_price").html(Number(sessionStorage.getItem("Steem_internalmarket_price")).toFixed(2));
+		sessionStorage.setItem("sbdsteem_market_price",Number(result.asks[0].real_price).toFixed(2));
+		$(".sbdsteem_market_price").html(Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2));
 	});	
 	steem.api.getCurrentMedianHistoryPrice(function(err, result) {
 		regex = /([0-9].*\.[0-9]{3})/g;
@@ -138,26 +149,65 @@ $(document).ready(function() {
 	$("#reward").on("keyup", function() {
 		sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
 		dollar_part = (Number.parseFloat(this.value)/2);
+		sessionStorage.setItem("sbd_part",sbd_part);
 		$(".sbd_part").html(Number(sbd_part).toFixed(2));
 		$(".dollar_part").html(Number(dollar_part).toFixed(2));
 		$(".total-50-50").html(Number(dollar_part + sbd_part).toFixed(2));
 		$(".total-100").html(Number(this.value).toFixed(2));
 		
+				
 		
-		console.log("sbdSteem Price " + sessionStorage.getItem("Steem_internalmarket_price"));
-		console.log("SBD part " + Number.parseFloat(this.value)/2  + " to steem : "+ Number.parseFloat(this.value)/2/sessionStorage.getItem("Steem_internalmarket_price"));
-		console.log("STEEM part : "+ (Number.parseFloat(this.value)/2/sessionStorage.getItem("steem_price")));
-		
-		
-		
-		
-		reward_5050_insteem = ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("Steem_internalmarket_price")) + ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price"));
+		reward_5050_insteem = ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price")) + ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price"));
 		reward_100_insteem = Number.parseFloat(this.value)/sessionStorage.getItem("steem_price");
-		$(".sbd_reinvested").html(Number(Number.parseFloat(this.value)/2/sessionStorage.getItem("Steem_internalmarket_price")).toFixed(2));
+		sbd_reinvested = (Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price");
+		sessionStorage.setItem("sbd_reinvested",sbd_reinvested);
+		$(".sbd_reinvested").html(Number(sbd_reinvested).toFixed(2));
 		$(".steem").html(Number((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price")).toFixed(2));
 		$(".total-50-50-insteem").html(Number(reward_5050_insteem).toFixed(2));
 		$(".total-100-insteem").html(Number(reward_100_insteem).toFixed(2));
+		sessionStorage.setItem("reward_100_insteem",reward_100_insteem);
 		
+	});
+	
+	$('.sbd_part_info').click(function(){
+		$('.modal-title').html("50% Steem Dollar real Value");
+		details = "<b>(Reward In Steem Dollar / 2) x Steem Dollar Price : </b> (" + $('#reward').val() + "/ 2) x " + Number(sessionStorage.getItem("sbd_price")).toFixed(2) + " = " + Number(sessionStorage.getItem("sbd_part")).toFixed(2);
+		$('.modal-details').html(details);
+		$('#modaldiv').modal('show');
+	});
+	$('.dollar_part_info').click(function(){
+		$('.modal-title').html("50% Steem Power real Value");
+		details = "<b>(Reward In Steem Dollar / 2) : </b> (" + $('#reward').val() + "/ 2) " + " = " + $('#reward').val()/2;
+		$('.modal-details').html(details);
+		$('#modaldiv').modal('show');
+	});
+	$('.total-50-50_info').click(function(){
+		$('.modal-title').html("Total");
+		total = Number.parseFloat(Number(sessionStorage.getItem("sbd_part")).toFixed(2)) + $('#reward').val()/2;
+		details = "<b>Steem Dollar Real Value + Steem Poer Real Value : </b> " + Number(sessionStorage.getItem("sbd_part")).toFixed(2) + " + " + $('#reward').val()/2 + " = " + total;
+		$('.modal-details').html(details);
+		$('#modaldiv').modal('show');
+	});
+	$('.total-100_info').click(function(){
+		$('.modal-title').html("Total");
+		details = "<b>Total : </b> " + Number(sessionStorage.getItem("reward_100_insteem")).toFixed(2);
+		$('.modal-details').html(details);
+		$('#modaldiv').modal('show');
+	});
+	$('.sbd_reinvested_info').click(function(){
+		$('.modal-title').html("50% Steem dollars in STEEM (via internal market)");
+		details = "<b>(Reward In Steem Dollar / 2) /  SBD/STEEM price (market) : </b> (" + $('#reward').val() + "/ 2) / " +  Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2) + " = " + Number(sessionStorage.getItem("sbd_reinvested")).toFixed(2);
+		$('.modal-details').html(details);
+		$('#modaldiv').modal('show');
+	});
+	$('.steem_info').click(function(){
+		$('#modaldiv').modal('show');
+	});
+	$('.total-50-50-insteem').click(function(){
+		$('#modaldiv').modal('show');
+	});
+	$('.total-100-insteem').click(function(){
+		$('#modaldiv').modal('show');
 	});
     </script>
 </body>
@@ -166,4 +216,3 @@ $(document).ready(function() {
 
 
 </html> 
-w
