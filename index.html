@@ -9,16 +9,58 @@
 
 <body>
 
-	<div class="ui two column centered grid">
+	<div class="ui two column  centered grid">
 		<div class="column">
 			<p>
 			<h3 class="ui header">Type your reward in Steem Dollar (as displayed on Steemit and Busy)</h3>
 			<div class="ui input" >
 				<input placeholder="Type your reward..." type="text" id="reward">
 			</div>
+			
 			</p>
+			<div class="ui divider"></div>
+			<table class="ui celled definition table">
 
+			<thead>
+				<tr>
+					<th></th>
+					<th colspan="2" style="text-align: center">50/50</th>
+					<th style="text-align: center">100% STEEM POWER</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th style="text-align: center" >50% SBD </th>
+					<th style="text-align: center">50% STEEM POWER</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+				<td>USD Value</td>
+				<td style="text-align: center" class="sbd_part">0</td>
+				<td style="text-align: center" class="dollar_part">0</td>
+				<td style="text-align:center" class="total-100">0</td>
+				</tr>
+				<tr>
+				<td >Total USD</td>
+				<td colspan="2" style="text-align: center"  class="total-50-50">0</td>
+				<td style="text-align:center" class="total-100">0</td>
+                </tr>
+				<tr>
+				<td>STEEM Value</td>
+				<td style="text-align: center" class="sbd_reinvested">0</td>
+				<td style="text-align: center" class="steem">0</td>
+				<td style="text-align:center" class="total-100-insteem">0</td>
+				</tr>
+				<tr>
+				<td>Total STEEM POWER</td>
+				<td colspan="2" style="text-align:center" class="total-50-50-insteem">0</td>
+				<td style="text-align:center" class="total-100-insteem">0</td>
+                </tr>
+			</tbody>
+			</table>
 
+			
 			<div class="ui divider"></div>
 			<h3 class="ui header">50/50 reward</h3>
 			<p>
@@ -106,12 +148,13 @@ $(document).ready(function() {
 		console.log("SBD part " + Number.parseFloat(this.value)/2  + " to steem : "+ Number.parseFloat(this.value)/2/sessionStorage.getItem("Steem_internalmarket_price"));
 		console.log("STEEM part : "+ (Number.parseFloat(this.value)/2/sessionStorage.getItem("steem_price")));
 		
+		
+		
+		
 		reward_5050_insteem = ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("Steem_internalmarket_price")) + ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price"));
-		
-		console.log("50 50 reinvested : " + reward_5050_insteem);
-		
 		reward_100_insteem = Number.parseFloat(this.value)/sessionStorage.getItem("steem_price");
 		$(".sbd_reinvested").html(Number(Number.parseFloat(this.value)/2/sessionStorage.getItem("Steem_internalmarket_price")).toFixed(2));
+		$(".steem").html(Number((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price")).toFixed(2));
 		$(".total-50-50-insteem").html(Number(reward_5050_insteem).toFixed(2));
 		$(".total-100-insteem").html(Number(reward_100_insteem).toFixed(2));
 		
@@ -123,3 +166,4 @@ $(document).ready(function() {
 
 
 </html> 
+w
