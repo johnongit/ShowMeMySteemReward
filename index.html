@@ -8,6 +8,11 @@
 </head>
 
 <body>
+	<script>
+		// Configure Steem API endpoint
+		steemApi_endpoint = "https://api.steemit.com";
+	</script>
+	
 	<span data-toggle="modal"></span>
 	
 	<div class="ui modal" id="modaldiv">
@@ -68,7 +73,16 @@
 			</tbody>
 			</table>
 			
-			
+		<div class="ui divider"></div>
+					<p>
+			<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
+			</p>
+			<p>
+			<span><b>SBD/STEEM Price (internal market) : </b></span><span class="sbdsteem_market_price">0</span> <span>STEEM</span>
+			</p>
+			<p>
+			<span><b>SBD/STEEM Price (median price) : </b></span><span class="steem_price">0</span> <span>STEEM</span>
+			</p>
 			
 			
 			
@@ -94,24 +108,48 @@
 
 <script>
 $(document).ready(function() {
-	steem.api.setOptions({ url: 'https://api.steemit.com' });
+	steem.api.setOptions({ url: steemApi_endpoint});
 	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
 		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
 		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
+	})
+  	.fail(function() {
+			$('.modal-title').html("API connection problem");
+			details = "Cannot connect to CoinMarketCap API";
+			$('.modal-details').html(details);
+			$('#modaldiv').modal('show');
 	});
 	steem.api.getOrderBook(1, function(err, result) {
-		sessionStorage.setItem("sbdsteem_market_price",Number(result.asks[0].real_price).toFixed(2));
-		$(".sbdsteem_market_price").html(Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2));
+		if(err) {
+			$('.modal-title').html("API connection problem");
+			details = "Cannot connect to Steem API endpoint :  " +  steemApi_endpoint;
+			$('.modal-details').html(details);
+			$('#modaldiv').modal('show');
+		}
+		else
+		{
+			sessionStorage.setItem("sbdsteem_market_price",Number(result.asks[0].real_price).toFixed(2));
+			$(".sbdsteem_market_price").html(Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2));
+		}
 	});	
 	steem.api.getCurrentMedianHistoryPrice(function(err, result) {
-		regex = /([0-9].*\.[0-9]{3})/g;
-		sessionStorage.setItem("quote", regex.exec(result.quote)[0]);
-		regex = /([0-9].*\.[0-9]{3})/g;	
-  		sessionStorage.setItem("base", regex.exec(result.base)[0]);	
-  		steem_price = sessionStorage.getItem("base") / sessionStorage.getItem("quote");
-  		sessionStorage.setItem("steem_price",steem_price);
-  		$(".steem_price").html(Number(sessionStorage.getItem("steem_price")).toFixed(2));
+		if(err) {
+			$('.modal-title').html("API connection problem");
+			details = "Cannot connect to Steem API endpoint :  " +  steemApi_endpoint;
+			$('.modal-details').html(details);
+			$('#modaldiv').modal('show');
+		}
+		else
+		{
+			regex = /([0-9].*\.[0-9]{3})/g;
+			sessionStorage.setItem("quote", regex.exec(result.quote)[0]);
+			regex = /([0-9].*\.[0-9]{3})/g;	
+  			sessionStorage.setItem("base", regex.exec(result.base)[0]);	
+  			steem_price = sessionStorage.getItem("base") / sessionStorage.getItem("quote");
+  			sessionStorage.setItem("steem_price",steem_price);
+  			$(".steem_price").html(Number(sessionStorage.getItem("steem_price")).toFixed(2));
+  		}
 	});
 });
 	$("#reward").on("keyup", function() {
