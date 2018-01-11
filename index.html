@@ -109,7 +109,9 @@
 <script>
 $(document).ready(function() {
 	steem.api.setOptions({ url: steemApi_endpoint});
-	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
+
+	  $.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
+
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
 		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
 		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
