@@ -61,7 +61,7 @@
 				<tr>
 				<td>STEEM Value</td>
 				<td style="text-align: center"><span class="sbd_reinvested">0</span><i class="help circle icon sbd_reinvested_info"></i></td>
-				<td style="text-align: center" class="steem"><span class="steem">0</span><i class="help circle icon steem_info"></i></td>
+				<td style="text-align: center"><span class="steem">0</span><i class="help circle icon steem_info"></i></td>
 				<td style="text-align:center"><span class="total-100-insteem">0</span></td>
 				</tr>
 				<tr>
@@ -160,9 +160,11 @@ $(document).ready(function() {
 		reward_5050_insteem = ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price")) + ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price"));
 		reward_100_insteem = Number.parseFloat(this.value)/sessionStorage.getItem("steem_price");
 		sbd_reinvested = (Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price");
+		steem = (Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price")
+		sessionStorage.setItem("steem",steem);
 		sessionStorage.setItem("sbd_reinvested",sbd_reinvested);
 		$(".sbd_reinvested").html(Number(sbd_reinvested).toFixed(2));
-		$(".steem").html(Number((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price")).toFixed(2));
+		$(".steem").html(Number(steem).toFixed(2));
 		$(".total-50-50-insteem").html(Number(reward_5050_insteem).toFixed(2));
 		$(".total-100-insteem").html(Number(reward_100_insteem).toFixed(2));
 		sessionStorage.setItem("reward_100_insteem",reward_100_insteem);
@@ -201,6 +203,9 @@ $(document).ready(function() {
 		$('#modaldiv').modal('show');
 	});
 	$('.steem_info').click(function(){
+		$('.modal-title').html("50% Steem dollars in STEEM (via median price)");
+		details = "<b>(Reward In Steem Dollar / 2) /  SBD/STEEM median price : </b> (" + $('#reward').val() + "/ 2) / " +  Number(sessionStorage.getItem("steem")).toFixed(2) + " = " + Number(sessionStorage.getItem("steem")).toFixed(2);
+		$('.modal-details').html(details);
 		$('#modaldiv').modal('show');
 	});
 	$('.total-50-50-insteem').click(function(){
