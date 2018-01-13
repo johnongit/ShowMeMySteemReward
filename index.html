@@ -7,7 +7,7 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.11.8/semantic.min.css"/>
 </head>
 
-<body>
+<body style="background: #FFFFFF;">
 	<script>
 		// Configure Steem API endpoint
 		steemApi_endpoint = "https://api.steemit.com";
@@ -40,7 +40,7 @@
 
 			<thead>
 				<tr>
-					<th></th>
+					<th bgcolor="#FF0000"></th>
 					<th colspan="3" style="text-align: center">50/50</th>
 					<th style="text-align: center">100% STEEM POWER</th>
 				</tr>
@@ -49,7 +49,7 @@
 					<th style="text-align: center" >50% SBD </th>
 					<th style="text-align: center">50% STEEM POWER</th>
 					<th style="text-align: center">Total</th>
-					<th></th>
+					<th style="text-align: center">Total</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -109,9 +109,7 @@
 <script>
 $(document).ready(function() {
 	steem.api.setOptions({ url: steemApi_endpoint});
-
-	  $.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
-
+	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
 		sbd_price = Number(sessionStorage.getItem("sbd_price")).toFixed(2);
 		$(".sbd_price").html(Number(sessionStorage.getItem("sbd_price")).toFixed(2)); 
