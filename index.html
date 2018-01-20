@@ -192,7 +192,7 @@ function DisplayMyReward(reward) {
 function getAuthorReward(author, permlink,callback) {
 	steem.api.getContent(author, permlink, function(err, result) {
 
-		//console.log(result);
+	//console.log(result);
 		if (result.author!= "") {
 			
 			vote_rshares = result.vote_rshares;
