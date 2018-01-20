@@ -33,8 +33,22 @@
 			<div class="ui input" >
 				<input placeholder="Type your reward..." type="text" id="reward" value=0>
 			</div>
+			<h3 class="ui header">... or get your estimated reward</h3>
+				<form class="ui form" id="link_form">
+
+  						<div class="ten wide field">
+    						<label>Link</label>
+    						<input type="text" name="link_field" placeholder="https://steemit/@evildido/..." id="link_field">
+    					</div>
+    				<button class="ui button" type="submit">Submit</button>
+				</form>
 			
 			</p>
+			<div id="block_post_reward" style="visibility:hidden;">
+				<div class="ui divider"></div>
+				<h3 class="ui header" id="header_post_reward"></h3>
+				<span id="details_post_reward"></span>
+			</div>
 			<div class="ui divider"></div>
 			<table class="ui celled definition table">
 
@@ -74,14 +88,14 @@
 			</table>
 			
 		<div class="ui divider"></div>
-					<p>
-			<span><b>SBD Price : </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
+			<p>
+			<span><b>SBD Price (coinmarket): </b></span><span class="sbd_price">0</span> <span>US Dollar(s)</span>
 			</p>
 			<p>
 			<span><b>SBD/STEEM Price (internal market) : </b></span><span class="sbdsteem_market_price">0</span> <span>STEEM</span>
 			</p>
 			<p>
-			<span><b>SBD/STEEM Price (median price) : </b></span><span class="steem_price">0</span> <span>STEEM</span>
+			<span><b>SBD/STEEM Price (median price) : </b></span><span class="sbdsteem_median_price">0</span> <span>STEEM</span>
 			</p>
 			
 			
@@ -108,6 +122,8 @@
 
 <script>
 $(document).ready(function() {
+	var author_reward;
+	// GetPrice
 	steem.api.setOptions({ url: steemApi_endpoint});
 	$.get('https://api.coinmarketcap.com/v1/ticker/steem-dollars/', function(data) {
 		sessionStorage.setItem("sbd_price",data[0].price_usd);
@@ -146,92 +162,215 @@ $(document).ready(function() {
 			sessionStorage.setItem("quote", regex.exec(result.quote)[0]);
 			regex = /([0-9].*\.[0-9]{3})/g;	
   			sessionStorage.setItem("base", regex.exec(result.base)[0]);	
-  			steem_price = sessionStorage.getItem("base") / sessionStorage.getItem("quote");
-  			sessionStorage.setItem("steem_price",steem_price);
-  			$(".steem_price").html(Number(sessionStorage.getItem("steem_price")).toFixed(2));
+  			sbdsteem_median_price = sessionStorage.getItem("base") / sessionStorage.getItem("quote");
+  			sessionStorage.setItem("sbdsteem_median_price",sbdsteem_median_price);
+  			$(".sbdsteem_median_price").html(Number(sessionStorage.getItem("sbdsteem_median_price")).toFixed(2));
   		}
-	});
+	});	
 });
-	$("#reward").on("keyup", function() {
-		sbd_part = (Number.parseFloat(this.value)/2) * sessionStorage.getItem("sbd_price");
-		dollar_part = (Number.parseFloat(this.value)/2);
-		total_50_50 = dollar_part + sbd_part;
-		
-		$(".sbd_part").html(Number(sbd_part).toFixed(2));
-		$(".dollar_part").html(Number(dollar_part).toFixed(2));
-		$(".total-50-50").html(Number(total_50_50).toFixed(2));
-		$(".total-100").html(Number(this.value).toFixed(2));
-		
+
+	
+function DisplayMyReward(reward) {
+	sbd_part = (Number.parseFloat(reward)/2) * sessionStorage.getItem("sbd_price");
+	dollar_part = (Number.parseFloat(reward)/2);
+	total_50_50 = dollar_part + sbd_part;
+	reward_5050_insteem = ((Number.parseFloat(reward)/2)/sessionStorage.getItem("sbdsteem_market_price")) + ((Number.parseFloat(reward)/2)/sessionStorage.getItem("sbdsteem_median_price"));
+	reward_100_insteem = Number.parseFloat(reward)/sessionStorage.getItem("sbdsteem_median_price");
+	sbd_reinvested = (Number.parseFloat(reward)/2)/sessionStorage.getItem("sbdsteem_market_price");
+	steem_reward = (Number.parseFloat(reward)/2)/sessionStorage.getItem("sbdsteem_median_price");
+	
+	$(".sbd_part").html(Number(sbd_part).toFixed(2));
+	$(".dollar_part").html(Number(dollar_part).toFixed(2));
+	$(".total-50-50").html(Number(total_50_50).toFixed(2));
+	$(".total-100").html(Number(reward).toFixed(2));
+	$(".sbd_reinvested").html(Number(sbd_reinvested).toFixed(2));
+	$(".steem").html(Number(steem_reward).toFixed(2));
+	$(".total-50-50-insteem").html(Number(reward_5050_insteem).toFixed(2));
+	$(".total-100-insteem").html(Number(reward_100_insteem).toFixed(2));
+}
+
+function getAuthorReward(author, permlink,callback) {
+	steem.api.getContent(author, permlink, function(err, result) {
+
+		//console.log(result);
+		if (result.author!= "") {
+			
+			vote_rshares = result.vote_rshares;
+			regex = /([0-9].*\.[0-9]{3})/g;	
+			total_payout = regex.exec(result.pending_payout_value)[0];
+			var total_weight = 0;
+			last_payout = result.last_payout;
+			result.active_votes.forEach(function(active_vote) {
+				total_weight = total_weight + active_vote.weight;
+			});
+			//console.log(result.last_payout)
+			if(last_payout == "1970-01-01T00:00:00") {
+				var already_paid = 0;
+				if(total_payout>0)
+				{
+					var curator_weight_ratio = total_weight / result.total_vote_weight;
+					var author_part = Number(total_payout) * 0.75;
+					var curator_part = Number(total_payout) * 0.25;
+					var author_weight = (1 - curator_weight_ratio);
+					var author_reward = author_part + curator_part * author_weight;
+					var curator_reward = total_payout- author_reward;
 				
+				}
+				else
+				{
+					author_reward = 0;
+					curator_reward = 0;
+				
+				}
+				/*
+				console.log("Author part : " + author_part);
+				console.log("Curator Part : " + curator_part);
+				console.log("ratio : " + author_weight);
+				*/
+			}
+			else
+			{
+				// already paid
+				var already_paid = 1;
+				regex = /([0-9].*\.[0-9]{3})/g;
+				var author_reward = Number(regex.exec(result.total_payout_value)[0]);
+				regex = /([0-9].*\.[0-9]{3})/g;
+				var curator_reward = Number(regex.exec(result.curator_payout_value)[0]);
+				var total_payout = author_reward+curator_reward;
+
+			}
+			//console.log("Total author : " + author_reward);
+			
+		}
+		else
+		{
+			var author_reward = "error";
+			$('.modal-title').html("Error");
+			$('.modal-details').html("Contribution unknown");
+			$('#modaldiv').modal('show');
+		}
 		
-		reward_5050_insteem = ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price")) + ((Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price"));
-		reward_100_insteem = Number.parseFloat(this.value)/sessionStorage.getItem("steem_price");
-		sbd_reinvested = (Number.parseFloat(this.value)/2)/sessionStorage.getItem("sbdsteem_market_price");
-		steem = (Number.parseFloat(this.value)/2)/sessionStorage.getItem("steem_price");
+
+		sessionStorage.setItem("author_reward",author_reward)
+		callback(total_payout,author_reward,curator_reward,already_paid);
+	});
+
+}
+// Event
+$("#reward").on("keyup", function() {
+	DisplayMyReward(this.value);
+	$('#block_post_reward').css("visibility","hidden");
+	$('#header_post_reward').html("");
+	$('#details_post_reward').html("");
+
+});
+$('#link_form').submit(function(event){
+	link = $('#link_field')[0].value;
+	const regex = /(@[\w\d].*)\/([\w\d].*)/g;
+	let m;
+	var author = "";
+	var permlink = "";
+	if (regex.exec(link)!== null) {
+		const regex = /(@[\w\d].*)\/([\w\d].*)/g;
+		while ((m = regex.exec(link)) !== null) {
+			
+			
+			author = m[1].substring(1,m[1].length);
+			permlink = m[2]
+		}
+		//console.log(author,permlink);
+		
+		getAuthorReward(author,permlink, function(reward,author_reward, curator_reward,already_paid) {
+			DisplayMyReward(author_reward)
+			if(already_paid==1) {
+				header ="The post has been already paid"			}
+			else
+			{
+				header = "The estimated reward of the post"
+			}
+			author_percent = 100*(author_reward /reward);
+			curator_percent = 100*(curator_reward/reward);
+			reward_total = "<b>Reward</b> :  " + reward + " SBD";
+			author_part = "<b>Author</b> : " + Number(author_reward).toFixed(3) + " SBD ("+ Number(author_percent).toFixed(2) + "%)";
+			curator_part = "<b>Curator</b> : " + Number(curator_reward).toFixed(3) + " SBD("+ Number(curator_percent).toFixed(2) + "%)";
+			details = reward_total + "<br>" + author_part +"<br>" + curator_part;
+			//console.log(details);
+			$('#block_post_reward').css("visibility","visible");
+			$('#header_post_reward').html(header);
+			$('#details_post_reward').html(details);
+			
+		});
 		
 		
-		$(".sbd_reinvested").html(Number(sbd_reinvested).toFixed(2));
-		$(".steem").html(Number(steem).toFixed(2));
-		$(".total-50-50-insteem").html(Number(reward_5050_insteem).toFixed(2));
-		$(".total-100-insteem").html(Number(reward_100_insteem).toFixed(2));
+		event.preventDefault();
+	}
+	else
+	{
 		
+		event.preventDefault();
+		$('.modal-title').html("Error");
+		$('.modal-details').html("Please, Provide a valid link like https://busy.org/fr/@evildido/my-contribution");
+		$('#modaldiv').modal('show');
 		
-	});
-	
-	$('.sbd_part_info').click(function(){
-		$('.modal-title').html("50% Steem Dollar real Value");
-		details = "<b>(Reward In Steem Dollar / 2) x Steem Dollar Price : </b> (" + $('#reward').val() + "/ 2) x " + Number(sessionStorage.getItem("sbd_price")).toFixed(2) + " = " + Number(sbd_part).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.dollar_part_info').click(function(){
-		$('.modal-title').html("50% Steem Power real Value");
-		details = "<b>(Reward In Steem Dollar / 2) : </b> (" + $('#reward').val() + "/ 2) " + " = " + $('#reward').val()/2;
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.total-50-50_info').click(function(){
-		$('.modal-title').html("Total");
-		total = Number.parseFloat(Number(sessionStorage.getItem("sbd_part")).toFixed(2)) + $('#reward').val()/2;
-		details = "<b>Steem Dollar Real Value + Steem Power Real Value : </b> " + Number(sbd_part).toFixed(2) + " + " + $('#reward').val()/2 + " = " + total;
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.total-100_info').click(function(){
-		$('.modal-title').html("Total");
-		details = "<b>Total : </b> " + Number($('#reward').val()).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.sbd_reinvested_info').click(function(){
-		$('.modal-title').html("50% Steem dollars in STEEM (via internal market)");
-		details = "<b>(Reward In Steem Dollar / 2) /  (SBD/STEEM price (market)) : </b> (" + $('#reward').val() + "/ 2) / " +  Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2) + " = " + Number(sessionStorage.getItem("sbd_reinvested")).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.steem_info').click(function(){
-		$('.modal-title').html("50% Steem dollars in STEEM (via median price)");
-		details = "<b>(Reward In Steem Dollar / 2) /  (SBD/STEEM median price) : </b> (" + $('#reward').val() + "/ 2) / " +  Number(sessionStorage.getItem("steem_price")).toFixed(2) + " = " + Number(steem).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.total-50-50-insteem_info').click(function(){
-	
-		$('.modal-title').html("Total");
-		details = "<b>50% Steem Dollar (internal market) + 50% Steem Dollar (median price) : </b> " + Number(sbd_reinvested).toFixed(2) + " + " + Number(steem).toFixed(2) + " = " + Number(reward_5050_insteem).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-	$('.total-100-insteem_info').click(function(){
-		$('.modal-title').html("Total");
-		details = "<b>Reward /  (SBD/STEEM median price)  : </b> " + $('#reward').val() + " / " + Number(steem_price).toFixed(2) + " = " + Number(reward_100_insteem).toFixed(2);
-		$('.modal-details').html(details);
-		$('#modaldiv').modal('show');
-	});
-    </script>
+	}
+
+});
+
+$('.sbd_part_info').click(function(){
+	$('.modal-title').html("50% Steem Dollar real Value");
+	details = "<b>(Reward In Steem Dollar / 2) x Steem Dollar Price : </b> (" + sessionStorage.getItem("author_reward") + "/ 2) x " + Number(sessionStorage.getItem("sbd_price")).toFixed(2) + " = " + Number(sbd_part).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.dollar_part_info').click(function(){
+	$('.modal-title').html("50% Steem Power real Value");
+	details = "<b>(Reward In Steem Dollar / 2) : </b> (" + sessionStorage.getItem("author_reward") + "/ 2) " + " = " + sessionStorage.getItem("author_reward")/2;
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.total-50-50_info').click(function(){
+	$('.modal-title').html("Total");
+	total = Number.parseFloat(Number(sbd_part).toFixed(2)) + sessionStorage.getItem("author_reward")/2;
+	details = "<b>Steem Dollar Real Value + Steem Power Real Value : </b> " + Number(sbd_part).toFixed(2) + " + " + sessionStorage.getItem("author_reward")/2 + " = " + Number(total).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.total-100_info').click(function(){
+	$('.modal-title').html("Total");
+	details = "<b>Total : </b> " + Number(sessionStorage.getItem("author_reward")).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.sbd_reinvested_info').click(function(){
+	$('.modal-title').html("50% Steem dollars in STEEM (via internal market)");
+	details = "<b>(Reward In Steem Dollar / 2) /  (SBD/STEEM price (market)) : </b> (" + sessionStorage.getItem("author_reward") + "/ 2) / " +  Number(sessionStorage.getItem("sbdsteem_market_price")).toFixed(2) + " = " + Number(sbd_reinvested).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.steem_info').click(function(){
+	$('.modal-title').html("50% Steem dollars in STEEM (via median price)");
+	details = "<b>(Reward In Steem Dollar / 2) /  (SBD/STEEM median price) : </b> (" + sessionStorage.getItem("author_reward") + "/ 2) / " +  Number(sessionStorage.getItem("sbdsteem_median_price")).toFixed(2) + " = " + Number(steem_reward).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.total-50-50-insteem_info').click(function(){
+
+	$('.modal-title').html("Total");
+	details = "<b>50% Steem Dollar (internal market) + 50% Steem Dollar (median price) : </b> " + Number(sbd_reinvested).toFixed(2) + " + " + Number(steem_reward).toFixed(2) + " = " + Number(reward_5050_insteem).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+$('.total-100-insteem_info').click(function(){
+	$('.modal-title').html("Total");
+	details = "<b>Reward /  (SBD/STEEM median price)  : </b> " + sessionStorage.getItem("author_reward") + " / " + Number(sbdsteem_median_price).toFixed(2) + " = " + Number(reward_100_insteem).toFixed(2);
+	$('.modal-details').html(details);
+	$('#modaldiv').modal('show');
+});
+</script>
 </body>
 
 
 
 
 </html> 
+
